@@ -1,8 +1,10 @@
 Colouring by rank, and plotting ChrV so that can easily compare between IVM and MOX lines.
 
 # Diversity along the genome, calculated by GrENEDALF
-# Using Grenedalf v0.3.0
-# Using the ss57 file made with the Selection Line samples only
+
+_Using Grenedalf v0.3.0_
+
+Using the ss57 file made with the Selection Line samples only
 
 https://github.com/lczech/grenedalf/wiki/Subcommand:-diversity
 
