@@ -94,12 +94,12 @@ quit()
 
 Ok, now can filter for those snps you want to plot. Then plot them as follows perhaps:
 - subset chrV
-- reverse y-axis (so goes from 57 up to 0): This will make those with low REF allele counts stand out more
 - plot as geom_point with alpha=0.3
 - plot F3 faceted by line, colour by red_mox_line (so binary - grey vs blue?)
-- then plot over the top a subset of data (subset by red_mox_all) - colour these all yellow
 - then plot over the top a subset of data (subset by red_both) - colour these all something else - orange
 - then plot over the top a subset of data (subset by red_both_not_ctl) - could these all something else. - red
+
+_Note that there are more data files below than were used for the final plot - some were not sensible to include_
 
 ```
 grep -E 'redMOXnotCTL' Mar25_marked_400_Gf_F0_vs_SL_only_Sel_lines_Hcwbps18_q20Q30_noindels_ss57_AF_sample_counts.frequency.csv > redallMOX_Mar25_marked_400_Gf_F0_vs_SL_only_Sel_lines_Hcwbps18_q20Q30_noindels_ss57_AF_sample_counts.frequency
