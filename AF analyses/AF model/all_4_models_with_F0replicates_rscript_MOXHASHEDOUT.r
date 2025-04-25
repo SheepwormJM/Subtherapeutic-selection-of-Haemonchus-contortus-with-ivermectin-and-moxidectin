@@ -78,28 +78,28 @@ reshaped_data_original<-reshaped_data
 #################### MOXIDECTIN VS CONTROL ####################
 
 #for now select just moxidectin and control
-#tmp<-subset(reshaped_data_original, reshaped_data_original$treatment == "M" | reshaped_data_original$treatment == "C")
-#reshaped_data<-tmp
+tmp<-subset(reshaped_data_original, reshaped_data_original$treatment == "M" | reshaped_data_original$treatment == "C")
+reshaped_data<-tmp
 
 #add allele frequency column
-#head(reshaped_data)
-#reshaped_data <- reshaped_data %>% mutate(ref_freq=(REF_CNT / DEPTH))
+head(reshaped_data)
+reshaped_data <- reshaped_data %>% mutate(ref_freq=(REF_CNT / DEPTH))
 
-#reshaped_data <- reshaped_data %>% mutate(timenum = as.numeric(str_remove(timepoint,"F")),snp_ID = str_c(CHROM,"_",POS))
-#reshaped_data <- reshaped_data %>% mutate(scaled_timenum = scale(timenum))
+reshaped_data <- reshaped_data %>% mutate(timenum = as.numeric(str_remove(timepoint,"F")),snp_ID = str_c(CHROM,"_",POS))
+reshaped_data <- reshaped_data %>% mutate(scaled_timenum = scale(timenum))
 
-#reshaped_data$treatment <- factor(reshaped_data$treatment)
-#reshaped_data$replicate<- factor(reshaped_data$replicate)
+reshaped_data$treatment <- factor(reshaped_data$treatment)
+reshaped_data$replicate<- factor(reshaped_data$replicate)
 
 #add data / likelihood weights
-#reshaped_data$weight <- 1.0
-#reshaped_data$weight[reshaped_data$timenum == 0] <- 1.0/6.0
+reshaped_data$weight <- 1.0
+reshaped_data$weight[reshaped_data$timenum == 0] <- 1.0/6.0
 #########
 
 
 #key to fitting many models  is to nest the dataframe. We want to run one model for each SNP in the data:
 
-#by_SNP <- reshaped_data %>% group_by( CHROM,POS,snp_ID) %>% nest()
+by_SNP <- reshaped_data %>% group_by( CHROM,POS,snp_ID) %>% nest()
 
 #include replicate as a random effect using the lme4 library
 #You also need the broom.mixed library for the next step too
@@ -111,45 +111,45 @@ reshaped_data_original<-reshaped_data
 
 # Testing larger dataset:
 
-#library(broom.mixed)
+library(broom.mixed)
 
-#get_Mcoeff <- function(m1) {
-#if (is.infinite(logLik(m1))) { 
-#return(NaN)} else {
-#coef <- tidy(m1)
-#return (coef[coef$term == "scaled_timenum",]$estimate + coef[coef$term == "treatmentM:scaled_timenum",]$estimate)
-#}
-#}
+get_Mcoeff <- function(m1) {
+if (is.infinite(logLik(m1))) { 
+return(NaN)} else {
+coef <- tidy(m1)
+return (coef[coef$term == "scaled_timenum",]$estimate + coef[coef$term == "treatmentM:scaled_timenum",]$estimate)
+}
+}
 
 # This next function runs two different models, m1 and m2. The replicate (line) is a random factor variable, and we assume that all lines have equal variance (they do have very similar variance), and all are tested independently - they're not grouped by treatment
 # From the anova used to compare the two models we extract the p value and the moxidectin slope coefficient (calculated using the function above)
 
 
-#do_both_fits <- function(df) {
-#            m1 <- lmer(ref_freq ~ treatment*scaled_timenum+(1|replicate),data=df,weights=weight)
-#            m2 <- lmer(ref_freq ~ treatment+scaled_timenum+(1|replicate),data=df,weights=weight)
-#            a <- anova(m2,m1,test="LRT")    
-#            return(list(p=a$`Pr(>Chisq)`[2],m1.coef=get_Mcoeff(m1)))
-#}
+do_both_fits <- function(df) {
+            m1 <- lmer(ref_freq ~ treatment*scaled_timenum+(1|replicate),data=df,weights=weight)
+            m2 <- lmer(ref_freq ~ treatment+scaled_timenum+(1|replicate),data=df,weights=weight)
+            a <- anova(m2,m1,test="LRT")    
+            return(list(p=a$`Pr(>Chisq)`[2],m1.coef=get_Mcoeff(m1)))
+}
 
 #this also catches warnings - and lets the function continue past SNPs which have insufficient depth coverage - i.e. some samples have zero coverage. Otherwise it fails and nothing is output
-#do_both_fits_safely <- function(df) {
-#tryCatch(do_both_fits(df), error = function(err){NA}, warning=function(w){})
-#}
+do_both_fits_safely <- function(df) {
+tryCatch(do_both_fits(df), error = function(err){NA}, warning=function(w){})
+}
 
 # This actually runs the three functions above and outputs the results:
-#all_SNP <- SNP_results <- by_SNP %>% 
-#  mutate(fit_results = map(data, do_both_fits_safely))
+all_SNP <- SNP_results <- by_SNP %>% 
+  mutate(fit_results = map(data, do_both_fits_safely))
 
 # Got a warning with test data not noticed before when running MvsC (without F0 lines, but could have been there, who knows):
 # fixed-effect model matrix is rank deficient so dropping 1 column / coefficient
 # https://stackoverflow.com/questions/37090722/lme4lmer-reports-fixed-effect-model-matrix-is-rank-deficient-do-i-need-a-fi had some helpful info, although didn't understand it all, it is possible that trying a model without REML hasn't worked due to nested data?? Or missing data? Could be where have a depth of zero or something in some. 
 
 #reshape a bit to get coef and p-values from list
-#p_values_MC <- all_SNP %>% hoist(fit_results,"p","m1.coef") %>% mutate(neglogp=-1*log10(p))
+p_values_MC <- all_SNP %>% hoist(fit_results,"p","m1.coef") %>% mutate(neglogp=-1*log10(p))
 
 # Make a binary Robject file that could be easily reloaded if desired to replot the plot!
-#save(p_values_MC, file=(paste("MOX_vs_CTL_F0_results",my_date,".obj", sep="")))
+save(p_values_MC, file=(paste("MOX_vs_CTL_F0_results",my_date,".obj", sep="")))
 
 
 
