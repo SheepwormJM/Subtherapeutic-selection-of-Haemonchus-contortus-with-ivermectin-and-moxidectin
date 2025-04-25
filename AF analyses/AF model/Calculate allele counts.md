@@ -199,39 +199,18 @@ Have removed a lot of rows!
 4623268 Chr5_30-45Mb_AC_depth_allsites.txt
 938315 keep_Chr5_30-45Mb_AC_depth_allsites.csv
 ```
-So, to make the file smaller still... remove what I don't need - F0 and RAF columns:
+So, to make the file smaller still... remove what I don't need - RAF columns:
 ```
 awk '{print NF}' header_keep_Chr5_30-45Mb_AC_depth_allsites.csv | uniq > nf_file
 # Have 92 columns in total. Therefore...
-cut -f 1-4 header_keep_Chr5_30-45Mb_AC_depth_allsites.csv > first
-cut -f 7-85 header_keep_Chr5_30-45Mb_AC_depth_allsites.csv > second
-paste first second > tmp
-mv tmp noF0_keep_Chr5_30-45Mb_AC_depth_allsites.csv
-```
-Ok, the file size is now only 247 Mb. However, still have a fair number of SNPs (<1M, but not by much). To see if it will work in R on my laptop. If not then will split into groups of snps. 
-
-First, remove the F0.depth column! I forgot about this: 
-```
-cut -f 1-56 noF0_keep_Chr5_30-45Mb_AC_depth_allsites.csv > first
-cut -f 58-83 noF0_keep_Chr5_30-45Mb_AC_depth_allsites.csv > second
-paste first second > noF0_keep_Chr5_30-45Mb_AC_depth_allsites.csv
-```
-```
-scp -r jenni@scamper.mvls.gla.ac.uk:/home/jenni/data_folder/working_folder/selection_lines_poolseq/pairwise_comparisons/LINES_IN_CORRECT_ORDER/grenedalf/Jan24_F0_vs_all_sel_lines_only/all_sites/AF/noF0_keep_Chr5_30-45Mb_AC_depth_allsites.csv ./noF0_keep_Chr5_30-45Mb_AC_depth_allsites.csv
-```
-
-Debugging.. 
-```
-# in python3 try to extract snps which have missing data for at least one sample - i.e. no depth of coverage. Using the 1-99999 file of data with F0 columns removed.
-df['DEPTH_ZERO'] = np.where(((df['F3_I_L1.DEPTH'] == 0)) | ((df['F3_I_L2.DEPTH'] == 0)) | ((df['F3_I_L3.DEPTH'] == 0 )) | ((df['F3_M_L1.DEPTH'] == 0)) | ((df['F3_M_L2.DEPTH'] == 0 )) | ((df['F3_M_L3.DEPTH'] == 0 )), 'keep', np.nan)
-df.to_csv('marked_tmp.csv', sep='\t',na_rep='NaN', index=False)
+cut -f -85 header_keep_Chr5_30-45Mb_AC_depth_allsites.csv > Wholegenome_AC_depth_allsites.txt
 ```
 
 Rename the lines so that have nine replicates for the model (each line a different replicate) rather than grouping by treatment: 
 ```
 # Changed the header line using sed 
 
-sed 's/I_L1/I_L4/g' noF0_keep_Chr5_30-45Mb_AC_depth_allsites.csv | sed 's/I_L2/I_L5/g' | sed 's/I_L3/I_L6/g' | sed 's/M_L1/M_L7/g' | sed 's/M_L2/M_L8/g' | sed 's/M_L3/M_L9/g' > noF0_keep_Chr5_30-45Mb_AC_depth_allsites_NINE_REPLICATES.csv
+sed 's/I_L1/I_L4/g' Wholegenome_AC_depth_allsites.txt | sed 's/I_L2/I_L5/g' | sed 's/I_L3/I_L6/g' | sed 's/M_L1/M_L7/g' | sed 's/M_L2/M_L8/g' | sed 's/M_L3/M_L9/g' > Wholegenome_AC_depth_allsites_NINE_REPLICATES.txt
 ```
 
 # To check the number of SNPs over the entire genome/chrV and be able to compare with the locus: 
