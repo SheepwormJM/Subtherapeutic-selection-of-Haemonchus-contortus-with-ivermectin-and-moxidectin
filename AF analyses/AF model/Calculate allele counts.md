@@ -8,23 +8,9 @@ Note that the allele frequency is calculated from the sum of the ref and alt all
 
 ## Using all sites, all depths
 
-1. Create a new depth per site file (on 5th Dec 24), which will hopefully mirror the information in the mpileup.
-   
-[1. Get the data from the depth per site file
+1. Run Grenedalf on the mpileup file to obtain allele frequencies for all sites.
 
-```
-cut -f 1-29 Chr5_Sel_ps_correct_order_header.depth > Chr5_Sel_ps_correct_order_header_sellinesonly.depth
-
-awk 'BEGIN {FS=OFS="\t"} $2 > 30000000 && $2 < 45000000 {print $0}' Chr5_Sel_ps_correct_order_header_sellinesonly.depth > Chr5_locus_sellinesonly.depth
-
-wc -l Chr5_locus_sellinesonly.depth
-# 14836562 Chr5_locus_sellinesonly.depth
-```
-]
-
-2. Run Grenedalf on the mpileup file to obtain allele frequencies for all sites.
-
-Extract just the sites I am interested in - those from V:30-45Mb from teh sync file:
+Extract just the sites I am interested in - those from V:30-45Mb from the sync file:
 
 (pwd:Scamper,  /home/jenni/data_folder/working_folder/selection_lines_poolseq/mpileup/Jan24_correct_order_syncs)
 ```
@@ -71,48 +57,11 @@ grenedalf frequency \
 2>error_log_all_af &
 ```
 
-3. Combine the grenedalf allele count file and the depth per site file.
+2. Calculate the total depth per site.
 
-```
-ln -s ~/data_folder/selection_lines_poolseq_bams/header_depth_sellinesonly ./header_depth_sellinesonly
+Note that using samtools depth to do this outputs a different total depth from the mpileup sync file that Grenedalf uses as input. Therefore, will calculate the depth from the mpileup sync file.
 
-
-module load R/4.3.1
-R
-```
-Then, in R: 
-```
-library(dplyr)
-
-df<-read.table("Chr5_30-45Mb_400_Gf_F0_vs_SL_only_Hcwbps18_q20Q30_noindels_AF_sample_countsfrequency.csv", header=TRUE, sep="\t")
-df2<-read.table("SL_only_Dec_24_Chr5_30-45Mb.depth", header=FALSE, sep="\t")
-
-head(df)
-head(df2)
-
-# Join tables, keeping only rows present in both tables (this will account for removal of windows with no SNPs
-df3<-inner_join(df, df2, by=c("CHROM"="V1", "POS"="V2"))
-
-head(df3)
-
-write.table(df3, file="Chr5_30-45Mb_AC_depth_allsites.txt", row.names=FALSE, sep="\t", quote= FALSE) 
-```
-[
-First attempt
-
-Hmmm. No. Something seems to be wrong. Wondering if I have the depth not ACTUALLY in the correct order! Rechecking. 
-
-I think it is multi - wrong order maybe (use the Jan24 one) and also filtering secondary/qcfail in the depth.  re-run but include these in output and then see.
-]
-
-Second attempt with new depth file. 
-
-Much better but still often a few bases lower in the depth than in the grenedalf allele count. 
-
-Very annoying. Checked the mpileup sync file and is the same as grenedalf. 
-
-
-Can I sum the four bases in grenedalf? YES! This script will do the following: 
+This script will do the following: 
 - It will loop through the columns 4 to 30 (in the sync file there are 30 columns, the first three are concerned with the position and the SNP allele, the rest have the per sample data
 - It will then print each column, print the first 4 bases, and the deletions from that column and finally it will sum the counts of those 4 bases and deletions (so it ignores N's).
 - NICE! :D 
@@ -125,8 +74,6 @@ do
     awk -v col=$i 'BEGIN {FS=OFS="\t"} {print $col }' | awk 'BEGIN {FS=OFS=":"} {print $1,$2,$3,$4,$6}' | sed 's/\:/+/g' | bc > sum_col${i} ;
 done &
 ```
-WHOOOOT!!!!! Thank you God! So cool. :D 
-
 Right. Next - use paste to put the columns back together. 
 ```
 cut -f 1-3 /home/jenni/data_folder/working_folder/selection_lines_poolseq/mpileup/Jan24_correct_order_syncs/Chr5_locus_sellinesonly_Hcwbps18_q20Q30_noindel_lines_in_correct_order_Jan24.java.sync > positions
@@ -144,17 +91,35 @@ paste tmp2 tmp > tmp3
 mv tmp3 from_mpileupfile_SL_only_Dec_24_Chr5_30-45Mb.ACTGdepth
 ```
 
-Then, re-do the R joining above, but with 
+3. Combine the grenedalf allele count file and the depth per site file.
+
 ```
+module load R/4.3.1
+R
+```
+Then, in R: 
+```
+library(dplyr)
+
+df<-read.table("Chr5_30-45Mb_400_Gf_F0_vs_SL_only_Hcwbps18_q20Q30_noindels_AF_sample_countsfrequency.csv", header=TRUE, sep="\t")
 df2<-read.table("from_mpileupfile_SL_only_Dec_24_Chr5_30-45Mb.ACTGdepth", header=FALSE, sep="\t")
+
+head(df)
+head(df2)
+
+# Join tables, keeping only rows present in both tables (this will account for removal of windows with no SNPs
+df3<-inner_join(df, df2, by=c("CHROM"="V1", "POS"="V2"))
+
+head(df3)
+
+write.table(df3, file="Chr5_30-45Mb_AC_depth_allsites.txt", row.names=FALSE, sep="\t", quote= FALSE) 
 ```
-
-
-
-Then, attach the header:
+Then, attach the header.
 
 Note that to get it to work well with the R script I am adding .DEPTH to each of the depth column headers
 ```
+ln -s ~/data_folder/selection_lines_poolseq_bams/header_depth_sellinesonly ./header_depth_sellinesonly
+
 sed 's/\t/.DEPTH\t/g' header_depth_sellinesonly | sed 's/$/.DEPTH/g' > header_depth_sellinesonly_DEPTH
 
 cut -f 3- header_depth_sellinesonly_DEPTH > tmp
@@ -169,12 +134,6 @@ mv tmp3 Chr5_30-45Mb_AC_depth_allsites.txt
 
 wc -l Chr5_30-45Mb_AC_depth_allsites.txt
 # 4623268 Chr5_30-45Mb_AC_depth_allsites.txt
-```
-
-Ok. Then transfer to laptop (to get the right R version) and run model. Note - ran out of memory. To try on Scamper. (MARS had to go through flightdeck and was taking too long sitting in a queue. 
-
-```
-scp -r jenni@scamper.mvls.gla.ac.uk:/home/jenni/data_folder/working_folder/selection_lines_poolseq/pairwise_comparisons/LINES_IN_CORRECT_ORDER/grenedalf/Jan24_F0_vs_all_sel_lines_only/all_sites/AF/Chr5_30-45Mb_AC_depth_allsites.txt ./Chr5_30-45Mb_AC_depth_allsites.txt
 ```
 
 Am struggling to get it to run due to size on my laptop and installation of libraries on scamper and access on MARS. 
