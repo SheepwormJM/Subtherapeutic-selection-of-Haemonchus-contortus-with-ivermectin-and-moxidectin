@@ -133,14 +133,6 @@ wc -l *chrV
     4065 redboth_Mar25_marked_400_Gf_F0_vs_SL_only_Sel_lines_Hcwbps18_q20Q30_noindels_ss57_AF_sample_counts.frequency_chrV
 ```
 
-Transfer to OneDrive those tables that have the refzero SNPs for future reference:
-```
-C:
-cd "Users\jmi45g\OneDrive - University of Glasgow\BIOINFORMATICS\Roz's Hcon sequencing\Selection lines poolseq\AF"
-
-scp -r jenni@scamper.mvls.gla.ac.uk:/home/jenni/data_folder/working_folder/selection_lines_poolseq/pairwise_comparisons/LINES_IN_CORRECT_ORDER/grenedalf/Jan24_F0_vs_all_sel_lines_only/ss57/AF/new_analysis_March25 ./SLPS_ss57_AF_redrefAC_Mar25
-```
-
 Transfer the header to the smaller ChrV files:
 ```
 head -n1 Mar25_marked_400_Gf_F0_vs_SL_only_Sel_lines_Hcwbps18_q20Q30_noindels_ss57_AF_sample_counts.frequency.csv > header_AF_counts_marked
