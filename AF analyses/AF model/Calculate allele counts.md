@@ -1,5 +1,3 @@
-Needs updated still... 
-
 Using Grenedalf, calculate allele counts for the reference and the most common alternate allele for each site. 
 
 Do this for all sites, any depth. 
@@ -12,11 +10,11 @@ Note that the allele frequency is calculated from the sum of the ref and alt all
 
 Extract just the sites I am interested in - those from V:30-45Mb from the sync file:
 
-(pwd:Scamper,  /home/jenni/data_folder/working_folder/selection_lines_poolseq/mpileup/Jan24_correct_order_syncs)
+(#pwd:=Scamper,  ~/data_folder/working_folder/selection_lines_poolseq/mpileup/Jan24_correct_order_syncs)
 ```
 grep -e 'chr5' SL_ps_only_Hcwbps18_q20Q30_noindel_lines_in_correct_order_Jan24.java.sync | awk 'BEGIN {FS=OFS="\t"} $2 > 30000000 && $2 < 45000000 {print $0}' > Chr5_locus_sellinesonly_Hcwbps18_q20Q30_noindel_lines_in_correct_order_Jan24.java.sync
 ```
-Make the sample names file: 
+Make the sample names file (adjust another one): 
 ```
 sed 's/SLps_only_co_Hcwbps18_q20Q30_noindels_ss57/Chr5_locus_sellinesonly_Hcwbps18_q20Q30_noindel_lines_in_correct_order_Jan24/g' SL_ss57_sample_names.txt > SL_sample_names.txt
 ```
