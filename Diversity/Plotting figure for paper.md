@@ -760,16 +760,10 @@ theme_light()+
 theme(axis.title.x = element_text(size=10), axis.text.x = element_text(size=6), axis.title.y = element_text(size=10), axis.text.y = element_text(size=4), strip.text.x = element_text(size = 6, face = "bold", margin = margin(0.5,0,0.5,0, "mm")), strip.text.y = element_text(size = 6, face = "bold", angle=0), plot.title = element_text(size=10, hjust=0.5), legend.position = "top", legend.title = element_text(size=8), legend.text = element_text(size=6), legend.key.height=unit(0.2,"cm"), panel.spacing.x = unit(0.2, "mm"), panel.spacing.y = unit(0.75, "mm"))+
 ggtitle('F0 Tajimas D')
 
-patch<- IVM + MOX + CTL + F0 + plot_annotation(tag_levels = 'A') + plot_layout (axis_titles = "collect")
+patch<- IVM + MOX + CTL + F0 + plot_annotation(tag_levels = 'A') + plot_layout (axis_titles = "collect", ncol=2) & theme(plot.tag = element_text(size = 15), plot.tag.position = c(0.1, 1))
 patch
 
-#ggsave("EmergingMLR_manuscript_FigX_light_titles_TajimasD_CHR5.tiff", patch, device=tiff, width=2250, height=2250, units="px", dpi=320)
-ggsave("EmergingMLR_manuscript_FigX_light_titles_TajimasD_CHR5_withromannumerals.tiff", patch, device=tiff, width=2250, height=2250, units="px", dpi=320)
-
+ggsave("EmergingMLR_manuscript_FigX_light_titles_TajimasD_CHR5_withromannumerals_updated10-09-25.tiff", patch, device=tiff, width=2250, height=2250, units="px", dpi=320)
 ```
-_Image with roman numerals:_
-![image](https://github.com/user-attachments/assets/d83e5200-9e74-4c40-a3f8-ae36315ea4bb)
 
-
-_Original image_
-![image](https://github.com/user-attachments/assets/65b20964-b440-44d6-8dc2-424893a3c279)
+<img width="2250" height="2250" alt="image" src="https://github.com/user-attachments/assets/70c89268-a1a2-4bf1-9e8d-cd77005c77fd" />
