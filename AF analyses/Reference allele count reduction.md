@@ -369,10 +369,11 @@ geom_point(data=redsel_melt_ivm, colour="orange", alpha=1)+
 geom_point(data=refzeroI_melt_ivm, colour="#D55E00", alpha=1) # a red colour from a colour blind palette
 
 patchwork3 <- yI / yM
-plotme2<- patchwork3 + plot_annotation(tag_levels = 'A') + plot_layout(axis_titles = "collect")
+plotme2<- patchwork3 + plot_annotation(tag_levels = 'A') + plot_layout(axis_titles = "collect_x", ncol=1) & theme(plot.tag = element_text(size = 15))
 
-ggsave("ChrV_400_Gf_SLps_Hcwbps18_q20Q30_ss57_sellinesonly.AF_ref_count_MARCH2025_normY.tiff", plotme2, device=tiff, width=2250, height=3550, units="px", dpi=320)
+
+ggsave("ChrV_400_Gf_SLps_Hcwbps18_q20Q30_ss57_sellinesonly.AF_ref_count_MARCH2025_normY_updated10-09-25.tiff", plotme2, device=tiff, width=2250, height=3550, units="px", dpi=320)
 ```
 
-_Chr V reference allele count, plotted March 2025_
-![image](https://github.com/user-attachments/assets/940bae5a-abb0-4f97-aead-eeb3bcf86e36)
+_Chr V reference allele count_
+<img width="2250" height="3550" alt="image" src="https://github.com/user-attachments/assets/eb0f4bb0-a64e-413c-9cc2-bc006d7daa47" />
