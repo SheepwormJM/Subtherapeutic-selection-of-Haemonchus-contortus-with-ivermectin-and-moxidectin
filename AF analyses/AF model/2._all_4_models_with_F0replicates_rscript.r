@@ -9,6 +9,9 @@ if (length(args)==0) {
   args[2] = "out.txt"
 }
 
+# To run this R script remotely, copy and paste and save it. Then provide a command as follows, substituting with your own files/names.
+# all_4_models_with_F0replicates_rscript.r /path/to/input/file/ input_file_name output_file_name todays_date 
+
 input_path = args[1]
 input_file = args[2]
 output_file = args[3]
