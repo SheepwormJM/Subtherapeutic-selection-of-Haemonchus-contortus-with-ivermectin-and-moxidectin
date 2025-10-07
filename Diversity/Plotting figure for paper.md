@@ -1,3 +1,5 @@
+Note that for these analyses you will need the two R scripts which are also in this folder.
+
 Colouring by rank, and plotting ChrV so that can easily compare between IVM and MOX lines.
 
 # Diversity along the genome, calculated by GrENEDALF
